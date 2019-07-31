@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/thirdlove-admin/static/css/main.2cce8147.chunk.css",
+    "main.js": "/thirdlove-admin/static/js/main.a6b0dddd.chunk.js",
+    "main.js.map": "/thirdlove-admin/static/js/main.a6b0dddd.chunk.js.map",
+    "runtime~main.js": "/thirdlove-admin/static/js/runtime~main.d4483690.js",
+    "runtime~main.js.map": "/thirdlove-admin/static/js/runtime~main.d4483690.js.map",
+    "static/css/2.22a7d4ef.chunk.css": "/thirdlove-admin/static/css/2.22a7d4ef.chunk.css",
+    "static/js/2.43d9eef7.chunk.js": "/thirdlove-admin/static/js/2.43d9eef7.chunk.js",
+    "static/js/2.43d9eef7.chunk.js.map": "/thirdlove-admin/static/js/2.43d9eef7.chunk.js.map",
+    "index.html": "/thirdlove-admin/index.html",
+    "precache-manifest.582eba2e3abf812a5f18b3c397209f5c.js": "/thirdlove-admin/precache-manifest.582eba2e3abf812a5f18b3c397209f5c.js",
+    "service-worker.js": "/thirdlove-admin/service-worker.js",
+    "static/css/2.22a7d4ef.chunk.css.map": "/thirdlove-admin/static/css/2.22a7d4ef.chunk.css.map",
+    "static/css/main.2cce8147.chunk.css.map": "/thirdlove-admin/static/css/main.2cce8147.chunk.css.map"
+  }
+}
