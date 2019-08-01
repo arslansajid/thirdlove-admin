@@ -3,6 +3,8 @@ import Firebase from 'firebase';
 import config from './config';
 import './App.css';
 import Swal from 'sweetalert2';
+import Loader from 'react-loader-spinner';
+import Img from 'react-image'
 
 class App extends React.Component {
 
@@ -16,34 +18,14 @@ class App extends React.Component {
       name: '',
       role: '',
       image: null,
+      loading: true,
+      saveLoading: false
     }
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
-    this.getUserData();
-    // this.getImagesData();
-  }
-
-  getImagesData = () => {
-    console.log('fn called'); 
-    var imagesUrllArray = [];
-    let storageRef = Firebase.storage().ref('/images');
-    storageRef.listAll()
-    .then(function(result) {
-      result.items.forEach((imageRef) => {
-        imageRef.getDownloadURL()
-        .then(function(url) {
-          imagesUrllArray.push(url);
-        }).catch(function(error) {
-          console.log('Error fetching image URL')
-        });
-      })
-    }).catch(function(error) {
-      // Handle any errors
-    });
-    this.setState({
-      images: imagesUrllArray
-    })
+    this.getItemsData();
   }
   
   componentDidUpdate(prevProps, prevState) {
@@ -59,38 +41,66 @@ class App extends React.Component {
     console.log('DATA SAVED');
   }
   
-  getUserData = () => {
+  getItemsData = () => {
     let ref = Firebase.database().ref('/');
     ref.on('value', snapshot => {
       const data = snapshot.val();
       this.setState({
-        items: data.items
-      }, () => {
-        this.getImagesData();
+        items: data.items,
+        loading: false
       });
     });
   }
 
-  handleSubmit = (event) => {
-    event.preventDefault();
+  returnImageUrlonUpload = (image) => {
     const storageService = Firebase.storage();
     const storageRef = storageService.ref();
-    const { image } = this.state;
-    // let name = this.refs.name.value;
-    // let role = this.refs.role.value;
-
-      if(image) { //fn to upload image
-      const uploadTask = storageRef.child(`images/${image.name}`).put(image); //create a child directory called images, and place the file inside this directory
-      uploadTask.on('state_changed', (snapshot) => {
+    return new Promise(function(resolve, reject) {
+    const uploadTask = storageRef.child(`images/${image.name}`).put(image); //create a child directory called images, and place the file inside this directory
+    uploadTask.on('state_changed', (snapshot) => {
       // Observe state change events such as progress, pause, and resume
       }, (error) => {
         // Handle unsuccessful uploads
-        console.log(error);
+        reject(error);
       }, () => {
          // Do something once upload is complete
-         console.log('success');
+         console.log('File uploaded successfully');
+         uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+          console.log('File available at', downloadURL);
+          resolve(downloadURL);
+        });
       });
+    })
+  }
+
+  async handleSubmit (event) {
+    event.preventDefault();
+    this.setState({ saveLoading: true })
+    const storageService = Firebase.storage();
+    const storageRef = storageService.ref();
+    const { images } = this.state;
+    let imageUrl = '';
+
+    try {
+      if(images) { //fn to upload image
+        imageUrl = await this.returnImageUrlonUpload(images[0])
+      }
+    } catch(error) {
+      console.log('ERROR:', error);
     }
+
+  //alternative way to code a promise
+    // this.returnImageUrlonUpload(images)
+    // .then((url) => {
+    //   imageUrl = url;
+    // })
+    // .catch((error) => {
+    //   console.log('ERROR:', error)
+    // })
+
+    //   if(image) { //fn to upload image
+    //   imageUrl = await this.returnImageUrlonUpload(image)
+    // }
 
     let name = this.state.name;
     let role = this.state.role;
@@ -103,8 +113,8 @@ class App extends React.Component {
       });
       items[devIndex].name = name;
       items[devIndex].role = role;
-      items[devIndex].image = image;
-      this.setState({ items });
+      items[devIndex].imageUrl = imageUrl;
+      this.setState({ items, saveLoading: false });
       Swal.fire(
         'Item Updated!',
         'Item updated successfully!',
@@ -114,8 +124,8 @@ class App extends React.Component {
     else if (name && role ) {
       const uid = new Date().getTime().toString();
       const { items } = this.state;
-      items.push({ uid, name, role })
-      this.setState({ items });
+      items.push({ uid, name, role, imageUrl })
+      this.setState({ items, saveLoading: false });
       Swal.fire(
         'Item Added!',
         'Item added successfully!',
@@ -129,7 +139,7 @@ class App extends React.Component {
     this.setState({
       name: '',
       role: '',
-      image: null,
+      images: [],
     })
   }
   
@@ -180,14 +190,15 @@ class App extends React.Component {
   }
 
 handleImageFile = (event) => {
+  console.log('event', event.target.files)
   this.setState({
-    image: event.target.files[0]
+    images: event.target.files
   })
 
 }
 
   render() {
-    const { items, images } = this.state;
+    const { items, images,loading } = this.state;
     console.log(this.state);
     return(
       <div className="container">
@@ -198,13 +209,25 @@ handleImageFile = (event) => {
         </div>
         <div className='row'>
           <div className='col-xl-12'>
-          { 
+          {loading
+          ?
+          <div className="row justify-content-center">
+            <Loader
+              type="RevolvingDot"
+              color="#007bff"
+              height={150}
+              width={150}
+            />
+          </div>
+          :
             items
             .map(item => 
               <div key={item.uid} className="card float-left my-3 mr-3" style={{width: '18rem'}}>
                 <div className="card-body">
                   <h5 className="card-title">{ item.name }</h5>
                   <p className="card-text">{ item.role }</p>
+                  {/* <img width="50px" height="50px" src={item.imageUrl ? item.imageUrl : ''} alt={'item-pic'} /> */}
+                  <Img width="50px" height="50px" src={item.imageUrl ? item.imageUrl : ''} />
                   <p className="card-text">Total Images: { images ? images.length : 'No Images yet...' }</p>
                   <button onClick={ () => this.removeData(item) } className="btn btn-danger mr-2">Delete</button>
                   <button onClick={ () => this.updateData(item) } className="btn btn-primary mr-2">Edit</button>
@@ -230,11 +253,21 @@ handleImageFile = (event) => {
                 </div>
                 <div className="form-group col-md-6">
                   <label>Image</label>
-                  <input type="file" className="form-control file-select" accept="image/*" onChange={this.handleImageFile}/>
+                  <input type="file" multiple={true} className="form-control file-select" accept="image/*" onChange={this.handleImageFile}/>
                 </div>
               </div>
               <div className="">
                 <button type="submit" className="btn btn-lg btn-success">Save</button>
+                {this.state.saveLoading
+                ?
+                <Loader
+                  type="RevolvingDot"
+                  color="#007bff"
+                  height={100}
+                  width={100}
+                />
+                : null
+                }
               </div>
             </form>
           </div>
