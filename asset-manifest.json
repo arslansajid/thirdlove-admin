@@ -1,17 +1,18 @@
 {
   "files": {
     "main.css": "/thirdlove-admin/static/css/main.2cce8147.chunk.css",
-    "main.js": "/thirdlove-admin/static/js/main.512ba3d9.chunk.js",
-    "main.js.map": "/thirdlove-admin/static/js/main.512ba3d9.chunk.js.map",
+    "main.js": "/thirdlove-admin/static/js/main.1625cdb1.chunk.js",
+    "main.js.map": "/thirdlove-admin/static/js/main.1625cdb1.chunk.js.map",
     "runtime~main.js": "/thirdlove-admin/static/js/runtime~main.d4483690.js",
     "runtime~main.js.map": "/thirdlove-admin/static/js/runtime~main.d4483690.js.map",
-    "static/css/2.ffd2f184.chunk.css": "/thirdlove-admin/static/css/2.ffd2f184.chunk.css",
-    "static/js/2.0b953334.chunk.js": "/thirdlove-admin/static/js/2.0b953334.chunk.js",
-    "static/js/2.0b953334.chunk.js.map": "/thirdlove-admin/static/js/2.0b953334.chunk.js.map",
+    "static/css/2.dd477725.chunk.css": "/thirdlove-admin/static/css/2.dd477725.chunk.css",
+    "static/js/2.691d517e.chunk.js": "/thirdlove-admin/static/js/2.691d517e.chunk.js",
+    "static/js/2.691d517e.chunk.js.map": "/thirdlove-admin/static/js/2.691d517e.chunk.js.map",
     "index.html": "/thirdlove-admin/index.html",
-    "precache-manifest.5e2719af57d59e588229b0515e1b426b.js": "/thirdlove-admin/precache-manifest.5e2719af57d59e588229b0515e1b426b.js",
+    "precache-manifest.56d2306a468a4700048a57ab1a4ba31d.js": "/thirdlove-admin/precache-manifest.56d2306a468a4700048a57ab1a4ba31d.js",
     "service-worker.js": "/thirdlove-admin/service-worker.js",
-    "static/css/2.ffd2f184.chunk.css.map": "/thirdlove-admin/static/css/2.ffd2f184.chunk.css.map",
-    "static/css/main.2cce8147.chunk.css.map": "/thirdlove-admin/static/css/main.2cce8147.chunk.css.map"
+    "static/css/2.dd477725.chunk.css.map": "/thirdlove-admin/static/css/2.dd477725.chunk.css.map",
+    "static/css/main.2cce8147.chunk.css.map": "/thirdlove-admin/static/css/main.2cce8147.chunk.css.map",
+    "static/media/font-awesome.css": "/thirdlove-admin/static/media/fontawesome-webfont.fee66e71.woff"
   }
 }
