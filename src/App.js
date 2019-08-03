@@ -18,8 +18,10 @@ class App extends React.Component {
       items: [],
       images:[],
       updatedImages: [],
+      uploadedImagesUrls: [],
       name: '',
-      role: '',
+      price: '',
+      stars: '',
       image: null,
       loading: true,
       saveLoading: false,
@@ -80,11 +82,11 @@ class App extends React.Component {
   async handleSubmit (event) {
     event.preventDefault();
     this.setState({ saveLoading: true })
-    const { images, updatedImages } = this.state;
+    const { images, updatedImages, uploadedImagesUrls } = this.state;
     let imageUrl = [];
     let updatedImageUrl = [];
     try {
-      if(images.length && updatedImages.length) {
+      if(uploadedImagesUrls.length && updatedImages.length) {
         for(let i=0; i<= updatedImages.length; i++) {
           updatedImageUrl.push(await this.returnImageUrlonUpload(updatedImages[i]));
         }
@@ -98,17 +100,21 @@ class App extends React.Component {
     }
 
     let name = this.state.name;
-    let role = this.state.role;
-    let uid = this.refs.uid.value;
+    let price = this.state.price;
+    let stars = this.state.stars;
+    let colors = this.state.colors;
+    let id = this.refs.id.value;
     
-    if (uid && name && role){
+    if (id && name && price){
       const { items } = this.state;
       const devIndex = items.findIndex(data => {
-        return data.uid === uid 
+        return data.id === id 
       });
       items[devIndex].name = name;
-      items[devIndex].role = role;
-      items[devIndex].imageUrl = [...this.state.images, ...updatedImageUrl];
+      items[devIndex].price = price;
+      items[devIndex].stars = stars;
+      items[devIndex].colors = colors;
+      items[devIndex].imageUrl = [...imageUrl, ...updatedImageUrl, ...uploadedImagesUrls];
       this.setState({ items, saveLoading: false });
       Swal.fire(
         'Item Updated!',
@@ -116,10 +122,10 @@ class App extends React.Component {
         'success'
       )
     }
-    else if (name && role ) {
-      const uid = new Date().getTime().toString();
+    else if (name && price ) {
+      const id = new Date().getTime().toString();
       const { items } = this.state;
-      items.push({ uid, name, role, imageUrl })
+      items.push({ id, name, price, stars, imageUrl, colors })
       this.setState({ items, saveLoading: false });
       Swal.fire(
         'Item Added!',
@@ -128,13 +134,15 @@ class App extends React.Component {
       )
     }
 
-    this.refs.uid.value = '';
+    this.refs.id.value = '';
     this.setState({
       name: '',
-      role: '',
+      price: '',
+      stars: '',
       images: [],
       colors: [],
-      updatedImages: []
+      updatedImages: [],
+      uploadedImagesUrls: []
     })
   }
   
@@ -151,7 +159,7 @@ class App extends React.Component {
     }).then((result) => {
       if (result.value) {
         const newState = items.filter(data => {
-          return data.uid !== item.uid;
+          return data.id !== item.id;
         });
         this.setState({ items: newState });
         Swal.fire(
@@ -164,14 +172,15 @@ class App extends React.Component {
   }
   
   updateData = (item) => {
-    this.refs.uid.value = item.uid;
+    this.refs.id.value = item.id;
     // this.refs.name.value = item.name;
-    // this.refs.role.value = item.role;\
+    // this.refs.price.value = item.price;\
     this.setState({
       name: item.name,
-      role: item.role,
+      price: item.price,
+      stars: item.stars ? item.stars : '', 
       colors: item.colors ? item.colors : [],
-      images: item.imageUrl ? item.imageUrl : []
+      uploadedImagesUrls: item.imageUrl ? item.imageUrl : []
     })
   }
 
@@ -183,8 +192,8 @@ class App extends React.Component {
   }
 
   handleImageFile = (event) => {
-    const { images } = this.state;
-    if(images.length) {
+    const { uploadedImagesUrls } = this.state;
+    if(uploadedImagesUrls.length) {
       this.setState({
         updatedImages: event.target.files
       })
@@ -223,7 +232,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { items, images, loading } = this.state;
+    const { items,loading } = this.state;
     console.log(this.state);
     return(
       <div className="container">
@@ -246,10 +255,10 @@ class App extends React.Component {
           </div>
           :
             items.map((item, itemIndex) => 
-              <div key={item.uid} className="card float-left my-3 mr-3" style={{width: '18rem'}}>
+              <div key={item.id} className="card float-left my-3 mr-3" style={{width: '18rem'}}>
                 <div className="card-body">
                   <h5 className="card-title">{ item.name }</h5>
-                  <p className="card-text">{ item.role }</p>
+                  <p className="card-text">{ item.price }</p>
                   {
                     item.imageUrl && item.imageUrl.length
                     ?
@@ -263,6 +272,18 @@ class App extends React.Component {
                     })
                     :
                     null
+                  }
+                  <h5 className="card-title py-2">Colors: </h5>
+                  {
+                    item.colors && item.colors.length
+                    ?
+                    item.colors.map((color, index) => {
+                      return (
+                        <li key={index} className="card-text">{ color.label }</li>
+                      )
+                    })
+                    :
+                    <p>No Colors Added</p>
                   }
                   <p className="card-text">Total Images: { item.imageUrl ? item.imageUrl.length : 'No Images yet...' }</p>
                   <button onClick={ () => this.removeData(item) } className="btn btn-danger mr-2">Delete</button>
@@ -278,14 +299,18 @@ class App extends React.Component {
             <h1>Add new item here</h1>
             <form onSubmit={ this.handleSubmit }>
               <div className="form-row">
-                <input type='hidden' ref='uid' />
+                <input type='hidden' ref='id' />
                 <div className="form-group col-md-6">
                   <label>Name</label>
                   <input type="text" name="name" ref='name' className="form-control" placeholder="Name" value={this.state.name} onChange={this.handleInputChange} />
                 </div>
                 <div className="form-group col-md-6">
-                  <label>Role</label>
-                  <input type="text" name="role" ref='role' className="form-control" placeholder="Role" value={this.state.role} onChange={this.handleInputChange} />
+                  <label>Price</label>
+                  <input type="text" name="price" ref='price' className="form-control" placeholder="Price" value={this.state.price} onChange={this.handleInputChange} />
+                </div>
+                <div className="form-group col-md-6">
+                  <label>Stars</label>
+                  <input type="text" name="stars" ref='stars' className="form-control" placeholder="Stars" value={this.state.stars} onChange={this.handleInputChange} />
                 </div>
                 <div className="form-group col-md-6">
                   <label>Image</label>
